@@ -34,16 +34,16 @@
   <!-- Logo symbol (identity/user switch icon) -->
   <g transform="translate(100, 200)">
     <rect width="100" height="100" rx="20" fill="url(#logoGradient)"/>
-    <g transform="translate(50, 50)" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <!-- Person icon -->
-      <circle cx="-12" cy="-18" r="8" />
-      <path d="M -24,5 A 12,12 0 0,1 0,5" />
-      <!-- Arrow indicating switch -->
-      <path d="M 8,-8 L 20,-8" />
-      <path d="M 15,-14 L 21,-8 L 15,-2" />
-      <!-- Second person icon (smaller, faded) -->
-      <circle cx="18" cy="10" r="7" opacity="0.6" />
-      <path d="M 7,28 A 11,11 0 0,1 29,28" opacity="0.6" />
+    <g transform="translate(50, 48)" stroke="white" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <!-- Person 1 (left) -->
+      <circle cx="-18" cy="-14" r="8" />
+      <path d="M -30,0 A 12,10 0 0,1 -6,0" />
+      <!-- Arrow -->
+      <path d="M 2,-4 L 14,-4" />
+      <path d="M 9,-10 L 15,-4 L 9,2" />
+      <!-- Person 2 (right, slightly smaller, faded) -->
+      <circle cx="22" cy="-6" r="7" opacity="0.6" />
+      <path d="M 11,7 A 11,9 0 0,1 33,7" opacity="0.6" />
     </g>
   </g>
 
