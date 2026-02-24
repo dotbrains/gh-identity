@@ -56,6 +56,9 @@ make install
 # 1. Authenticate your GitHub accounts (if not already done)
 gh auth login  # repeat for each account
 
+# Note: You may need to configure the credential helper
+gh auth setup-git
+
 # 2. Run interactive setup
 gh identity init
 
