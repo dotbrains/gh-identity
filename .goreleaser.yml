@@ -1,0 +1,46 @@
+version: 2
+
+builds:
+  - id: gh-identity
+    main: ./cmd/gh-identity
+    binary: gh-identity
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+  - id: gh-identity-hook
+    main: ./cmd/gh-identity-hook
+    binary: gh-identity-hook
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - id: gh-identity-archive
+    builds:
+      - gh-identity
+      - gh-identity-hook
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^ci:"
+      - "^chore:"
