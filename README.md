@@ -1,5 +1,18 @@
 # gh-identity
 
+![gh-identity](https://raw.githubusercontent.com/dotbrains/gh-identity/main/assets/og-image.svg)
+
+[![CI](https://github.com/dotbrains/gh-identity/actions/workflows/ci.yml/badge.svg)](https://github.com/dotbrains/gh-identity/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/dotbrains/gh-identity)](https://goreportcard.com/report/github.com/dotbrains/gh-identity)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+![Go](https://img.shields.io/badge/-Go-00ADD8?style=flat-square&logo=go&logoColor=white)
+![GitHub CLI](https://img.shields.io/badge/-GitHub_CLI-181717?style=flat-square&logo=github&logoColor=white)
+![Cobra](https://img.shields.io/badge/-Cobra-00ADD8?style=flat-square&logo=go&logoColor=white)
+![YAML](https://img.shields.io/badge/-YAML-CB171E?style=flat-square&logo=yaml&logoColor=white)
+![macOS](https://img.shields.io/badge/-macOS-000000?style=flat-square&logo=apple&logoColor=white)
+![Linux](https://img.shields.io/badge/-Linux-FCC624?style=flat-square&logo=linux&logoColor=black)
+
 > *"One shell, many identities."*
 
 A `gh` CLI extension that provides seamless multi-account management, automatic context-based account switching, and per-directory identity binding.
