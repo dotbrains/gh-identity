@@ -145,6 +145,16 @@ Config lives in `~/.config/gh-identity/`:
 - `git/` — per-profile gitconfig fragments
 - `bin/` — hook binary
 
+## Troubleshooting
+
+### Issues pulling repositories
+
+If you encounter authentication errors when pulling, you may need to switch your active `gh` account first:
+
+```sh
+gh auth switch -u <user>
+```
+
 ## License
 
 MIT
