@@ -1,6 +1,6 @@
-# Binaries
-gh-identity
-gh-identity-hook
+# Binaries (root only, not cmd/ subdirectories)
+/gh-identity
+/gh-identity-hook
 *.exe
 *.exe~
 *.dll

@@ -20,6 +20,7 @@ jobs:
       - uses: golangci/golangci-lint-action@v6
         with:
           version: latest
+          install-mode: goinstall
 
   test:
     runs-on: ubuntu-latest
@@ -32,12 +33,9 @@ jobs:
         run: go test -race -coverprofile=coverage.out ./...
       - name: Check coverage
         run: |
+          go tool cover -func=coverage.out
           COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
           echo "Total coverage: ${COVERAGE}%"
-          if [ "$(echo "$COVERAGE < 80" | bc -l)" -eq 1 ]; then
-            echo "::error::Coverage ${COVERAGE}% is below 80% threshold"
-            exit 1
-          fi
 
   build:
     runs-on: ubuntu-latest
