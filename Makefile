@@ -27,5 +27,6 @@ clean:
 	rm -rf $(BIN_DIR) coverage.out coverage.html dist
 
 install: build
-	cp $(BIN_DIR)/gh-identity $(shell gh extension list --json path -q '.[0].path' 2>/dev/null || echo "$$HOME/.local/share/gh/extensions/gh-identity")/gh-identity 2>/dev/null || \
-		gh extension install .
+	$(eval EXT_DIR := $(shell gh extension list --json path -q '.[0].path' 2>/dev/null || echo "$$HOME/.local/share/gh/extensions/gh-identity"))
+	cp $(BIN_DIR)/gh-identity $(EXT_DIR)/gh-identity 2>/dev/null || gh extension install .
+	cp $(BIN_DIR)/gh-identity-hook $(EXT_DIR)/gh-identity-hook
