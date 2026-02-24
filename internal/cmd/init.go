@@ -109,7 +109,6 @@ func runInit(auth ghauth.Auth) error {
 		fmt.Println("✅ Hook binary installed.")
 	}
 
-
 	fmt.Println("\n🎉 Setup complete! Open a new terminal or source your shell config to activate.")
 	return nil
 }
