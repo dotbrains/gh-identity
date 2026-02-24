@@ -21,13 +21,13 @@ const (
 
 // EnvOutput holds the environment variables to export.
 type EnvOutput struct {
-	GHToken            string
-	GitAuthorName      string
-	GitAuthorEmail     string
-	GitCommitterName   string
-	GitCommitterEmail  string
-	GHIdentityProfile  string
-	GHSSHCommand       string // optional
+	GHToken           string
+	GitAuthorName     string
+	GitAuthorEmail    string
+	GitCommitterName  string
+	GitCommitterEmail string
+	GHIdentityProfile string
+	GHSSHCommand      string // optional
 }
 
 // Resolve loads config, resolves the binding for dir, and returns shell export statements.

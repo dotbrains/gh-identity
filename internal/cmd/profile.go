@@ -92,8 +92,8 @@ func runProfileAdd(auth ghauth.Auth, name string) error {
 
 func newProfileListCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "list",
-		Short: "List all configured profiles",
+		Use:     "list",
+		Short:   "List all configured profiles",
 		Aliases: []string{"ls"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runProfileList()
@@ -143,10 +143,10 @@ func runProfileList() error {
 
 func newProfileRemoveCmd() *cobra.Command {
 	return &cobra.Command{
-		Use:   "remove <name>",
-		Short: "Remove a profile and its associated bindings",
+		Use:     "remove <name>",
+		Short:   "Remove a profile and its associated bindings",
 		Aliases: []string{"rm"},
-		Args:  cobra.ExactArgs(1),
+		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runProfileRemove(args[0])
 		},

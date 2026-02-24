@@ -11,9 +11,9 @@ import (
 
 // Result holds the outcome of a binding resolution.
 type Result struct {
-	Profile     string // profile name, or "" if no match
-	BoundPath   string // the binding path that matched, or ""
-	IsDefault   bool   // true if the default profile was used (no binding match)
+	Profile   string // profile name, or "" if no match
+	BoundPath string // the binding path that matched, or ""
+	IsDefault bool   // true if the default profile was used (no binding match)
 }
 
 // ForDirectory resolves the active profile for the given directory.
