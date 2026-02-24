@@ -3,9 +3,10 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"github.com/dotbrains/gh-identity/internal/config"
 	"github.com/dotbrains/gh-identity/internal/ghauth"
-	"github.com/spf13/cobra"
 )
 
 func newSwitchCmd(auth ghauth.Auth) *cobra.Command {

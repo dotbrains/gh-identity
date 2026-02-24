@@ -7,10 +7,11 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	"github.com/dotbrains/gh-identity/internal/config"
 	"github.com/dotbrains/gh-identity/internal/ghauth"
 	"github.com/dotbrains/gh-identity/internal/gitconfig"
-	"github.com/spf13/cobra"
 )
 
 func newProfileCmd(auth ghauth.Auth) *cobra.Command {

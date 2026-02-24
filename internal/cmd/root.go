@@ -2,8 +2,9 @@
 package cmd
 
 import (
-	"github.com/dotbrains/gh-identity/internal/ghauth"
 	"github.com/spf13/cobra"
+
+	"github.com/dotbrains/gh-identity/internal/ghauth"
 )
 
 // NewRootCmd creates the root command for gh identity.

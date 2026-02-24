@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/spf13/cobra"
+
 	"github.com/dotbrains/gh-identity/internal/config"
 	"github.com/dotbrains/gh-identity/internal/gitconfig"
-	"github.com/spf13/cobra"
 )
 
 func newBindCmd() *cobra.Command {

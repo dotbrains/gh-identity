@@ -3,6 +3,7 @@
 package ghauth
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
@@ -20,17 +21,27 @@ type Auth interface {
 	ActiveUser() (string, error)
 }
 
+// execFn is the function signature for executing gh commands.
+type execFn func(args ...string) (bytes.Buffer, bytes.Buffer, error)
+
 // GHAuth is the default implementation using the gh CLI.
-type GHAuth struct{}
+type GHAuth struct {
+	exec execFn
+}
 
 // NewGHAuth returns a new default Auth implementation.
 func NewGHAuth() *GHAuth {
-	return &GHAuth{}
+	return &GHAuth{exec: ghExec}
+}
+
+// ghExec wraps gh.Exec.
+func ghExec(args ...string) (bytes.Buffer, bytes.Buffer, error) {
+	return gh.Exec(args...)
 }
 
 // Token retrieves the auth token for the given username via `gh auth token -u <user>`.
 func (g *GHAuth) Token(username string) (string, error) {
-	stdout, stderr, err := gh.Exec("auth", "token", "-u", username)
+	stdout, stderr, err := g.exec("auth", "token", "-u", username)
 	if err != nil {
 		return "", fmt.Errorf("gh auth token -u %s: %s: %w", username, stderr.String(), err)
 	}
@@ -39,7 +50,7 @@ func (g *GHAuth) Token(username string) (string, error) {
 
 // AuthenticatedUsers returns the list of authenticated users via `gh auth status`.
 func (g *GHAuth) AuthenticatedUsers() ([]string, error) {
-	stdout, stderr, err := gh.Exec("auth", "status", "-a")
+	stdout, stderr, err := g.exec("auth", "status", "-a")
 	if err != nil {
 		// gh auth status exits 1 if not logged in; check stderr.
 		output := stderr.String()
@@ -54,13 +65,18 @@ func (g *GHAuth) AuthenticatedUsers() ([]string, error) {
 
 // ActiveUser returns the currently active gh user via `gh auth status`.
 func (g *GHAuth) ActiveUser() (string, error) {
-	stdout, stderr, err := gh.Exec("auth", "status")
+	stdout, stderr, err := g.exec("auth", "status")
 	if err != nil {
 		return "", fmt.Errorf("gh auth status: %s: %w", stderr.String(), err)
 	}
 	combined := stdout.String() + stderr.String()
+	return parseActiveUser(combined)
+}
+
+// parseActiveUser extracts the active username from gh auth status output.
+func parseActiveUser(output string) (string, error) {
 	// Look for "Logged in to github.com account <user>"
-	for _, line := range strings.Split(combined, "\n") {
+	for _, line := range strings.Split(output, "\n") {
 		line = strings.TrimSpace(line)
 		if strings.Contains(line, "account") {
 			parts := strings.Fields(line)

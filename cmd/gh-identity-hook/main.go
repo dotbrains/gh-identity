@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	gh "github.com/cli/go-gh/v2"
+
 	"github.com/dotbrains/gh-identity/internal/hook"
 )
 

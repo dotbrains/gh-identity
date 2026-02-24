@@ -7,8 +7,9 @@ import (
 	"strings"
 
 	gh "github.com/cli/go-gh/v2"
-	"github.com/dotbrains/gh-identity/internal/ghauth"
 	"github.com/spf13/cobra"
+
+	"github.com/dotbrains/gh-identity/internal/ghauth"
 )
 
 func newCloneCmd(auth ghauth.Auth) *cobra.Command {
