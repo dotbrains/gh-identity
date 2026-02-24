@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func TestFormatExports_Fish(t *testing.T) {
+func TestFormatOutput_Fish(t *testing.T) {
 	env := EnvOutput{
-		GHToken:           "token123",
+		GHUser:            "testuser",
 		GitAuthorName:     "Test User",
 		GitAuthorEmail:    "test@example.com",
 		GitCommitterName:  "Test User",
@@ -15,10 +15,13 @@ func TestFormatExports_Fish(t *testing.T) {
 		GHIdentityProfile: "personal",
 	}
 
-	output := formatExports(Fish, env)
+	output := formatOutput(Fish, env)
 
-	if !strings.Contains(output, "set -gx GH_TOKEN") {
-		t.Error("missing fish GH_TOKEN export")
+	if !strings.Contains(output, "set -e GH_TOKEN") {
+		t.Error("missing fish GH_TOKEN unset")
+	}
+	if !strings.Contains(output, "gh auth switch --user testuser") {
+		t.Error("missing gh auth switch command")
 	}
 	if !strings.Contains(output, "set -gx GH_IDENTITY_PROFILE") {
 		t.Error("missing fish GH_IDENTITY_PROFILE export")
@@ -28,9 +31,9 @@ func TestFormatExports_Fish(t *testing.T) {
 	}
 }
 
-func TestFormatExports_Bash(t *testing.T) {
+func TestFormatOutput_Bash(t *testing.T) {
 	env := EnvOutput{
-		GHToken:           "token123",
+		GHUser:            "testuser",
 		GitAuthorName:     "Test User",
 		GitAuthorEmail:    "test@example.com",
 		GitCommitterName:  "Test User",
@@ -38,10 +41,13 @@ func TestFormatExports_Bash(t *testing.T) {
 		GHIdentityProfile: "personal",
 	}
 
-	output := formatExports(Bash, env)
+	output := formatOutput(Bash, env)
 
-	if !strings.Contains(output, "export GH_TOKEN=") {
-		t.Error("missing bash GH_TOKEN export")
+	if !strings.Contains(output, "unset GH_TOKEN") {
+		t.Error("missing bash GH_TOKEN unset")
+	}
+	if !strings.Contains(output, "gh auth switch --user testuser") {
+		t.Error("missing gh auth switch command")
 	}
 	if !strings.Contains(output, "export GH_IDENTITY_PROFILE=") {
 		t.Error("missing bash GH_IDENTITY_PROFILE export")
@@ -51,9 +57,9 @@ func TestFormatExports_Bash(t *testing.T) {
 	}
 }
 
-func TestFormatExports_SSHCommand(t *testing.T) {
+func TestFormatOutput_SSHCommand(t *testing.T) {
 	env := EnvOutput{
-		GHToken:           "token123",
+		GHUser:            "testuser",
 		GitAuthorName:     "Test",
 		GitAuthorEmail:    "test@test.com",
 		GitCommitterName:  "Test",
@@ -62,15 +68,15 @@ func TestFormatExports_SSHCommand(t *testing.T) {
 		GHSSHCommand:      "ssh -i /home/user/.ssh/id_work -o IdentitiesOnly=yes",
 	}
 
-	output := formatExports(Fish, env)
+	output := formatOutput(Fish, env)
 	if !strings.Contains(output, "GIT_SSH_COMMAND") {
 		t.Error("missing GIT_SSH_COMMAND export when SSH key is set")
 	}
 }
 
-func TestFormatExports_NoSSHCommand(t *testing.T) {
+func TestFormatOutput_NoSSHCommand(t *testing.T) {
 	env := EnvOutput{
-		GHToken:           "token123",
+		GHUser:            "testuser",
 		GitAuthorName:     "Test",
 		GitAuthorEmail:    "test@test.com",
 		GitCommitterName:  "Test",
@@ -78,46 +84,8 @@ func TestFormatExports_NoSSHCommand(t *testing.T) {
 		GHIdentityProfile: "work",
 	}
 
-	output := formatExports(Fish, env)
+	output := formatOutput(Fish, env)
 	if strings.Contains(output, "GIT_SSH_COMMAND") {
 		t.Error("GIT_SSH_COMMAND should not be set when SSH key is empty")
-	}
-}
-
-func TestFormatExports_AskPass(t *testing.T) {
-	env := EnvOutput{
-		GHToken:           "token123",
-		GitAuthorName:     "Test",
-		GitAuthorEmail:    "test@test.com",
-		GitCommitterName:  "Test",
-		GitCommitterEmail: "test@test.com",
-		GHIdentityProfile: "work",
-		GitAskPass:        "/home/user/.config/gh-identity/bin/gh-identity-askpass",
-	}
-
-	output := formatExports(Fish, env)
-	if !strings.Contains(output, "GIT_ASKPASS") {
-		t.Error("missing GIT_ASKPASS export when askpass path is set")
-	}
-
-	output = formatExports(Bash, env)
-	if !strings.Contains(output, "export GIT_ASKPASS=") {
-		t.Error("missing bash GIT_ASKPASS export when askpass path is set")
-	}
-}
-
-func TestFormatExports_NoAskPass(t *testing.T) {
-	env := EnvOutput{
-		GHToken:           "token123",
-		GitAuthorName:     "Test",
-		GitAuthorEmail:    "test@test.com",
-		GitCommitterName:  "Test",
-		GitCommitterEmail: "test@test.com",
-		GHIdentityProfile: "work",
-	}
-
-	output := formatExports(Fish, env)
-	if strings.Contains(output, "GIT_ASKPASS") {
-		t.Error("GIT_ASKPASS should not be set when askpass path is empty")
 	}
 }

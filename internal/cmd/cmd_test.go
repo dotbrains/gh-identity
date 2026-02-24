@@ -356,8 +356,8 @@ func TestRunSwitch(t *testing.T) {
 	buf.ReadFrom(r)
 	output := buf.String()
 
-	if !containsStr(output, "test-token-123") {
-		t.Error("expected token in switch output")
+	if !containsStr(output, "gh auth switch --user user1") {
+		t.Error("expected gh auth switch in switch output")
 	}
 	if !containsStr(output, "GH_IDENTITY_PROFILE") {
 		t.Error("expected profile env var in output")
@@ -757,22 +757,16 @@ func TestRunProfileList_ActiveProfile(t *testing.T) {
 	}
 }
 
-// TestRunSwitch_TokenError tests switch when token retrieval fails.
-func TestRunSwitch_TokenError(t *testing.T) {
+// TestRunSwitch_ProfileNotFound tests switch with nonexistent profile.
+func TestRunSwitch_ProfileNotFound(t *testing.T) {
 	dir := setupTestEnv(t)
-	writeProfiles(t, dir, `profiles:
-  broken:
-    gh_user: baduser
-    git_name: Broken
-    git_email: broken@test.com`)
+	writeProfiles(t, dir, `profiles: {}`)
 
-	auth := &mockAuth{
-		err: fmt.Errorf("token error"),
-	}
+	auth := &mockAuth{}
 
-	err := runSwitch(auth, "broken")
+	err := runSwitch(auth, "nonexistent")
 	if err == nil {
-		t.Error("expected error when token fails")
+		t.Error("expected error when profile not found")
 	}
 }
 

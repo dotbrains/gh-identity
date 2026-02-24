@@ -109,12 +109,6 @@ func runInit(auth ghauth.Auth) error {
 		fmt.Println("✅ Hook binary installed.")
 	}
 
-	// Step 6: Install askpass helper for git HTTPS auth.
-	if err := installAskPassHelper(); err != nil {
-		fmt.Printf("⚠️  Could not install askpass helper: %v\n", err)
-	} else {
-		fmt.Println("✅ Askpass helper installed.")
-	}
 
 	fmt.Println("\n🎉 Setup complete! Open a new terminal or source your shell config to activate.")
 	return nil
@@ -212,22 +206,6 @@ func installHookBinary() error {
 		return err
 	}
 	return os.WriteFile(hookDst, src, 0o755)
-}
-
-func installAskPassHelper() error {
-	askpassPath, err := config.AskPassPath()
-	if err != nil {
-		return err
-	}
-	if err := os.MkdirAll(filepath.Dir(askpassPath), 0o755); err != nil {
-		return err
-	}
-
-	// A small POSIX script that echoes $GH_TOKEN for git HTTPS auth.
-	script := `#!/bin/sh
-echo "$GH_TOKEN"
-`
-	return os.WriteFile(askpassPath, []byte(script), 0o755)
 }
 
 func detectShell() string {

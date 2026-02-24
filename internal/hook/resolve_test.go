@@ -25,10 +25,6 @@ func setupTestConfig(t *testing.T, profilesYAML, bindingsYAML string) string {
 	return dir
 }
 
-func mockTokenFn(ghUser string) (string, error) {
-	return "mock-token-for-" + ghUser, nil
-}
-
 func TestResolve_WithBinding(t *testing.T) {
 	tmp := t.TempDir()
 	boundDir := filepath.Join(tmp, "code", "personal")
@@ -49,13 +45,13 @@ default: personal`,
     profile: personal`,
 	)
 
-	output, err := Resolve(boundDir, Fish, mockTokenFn)
+	output, err := Resolve(boundDir, Fish)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !strings.Contains(output, "mock-token-for-user1") {
-		t.Error("expected token for user1 in output")
+	if !strings.Contains(output, "gh auth switch --user user1") {
+		t.Error("expected gh auth switch for user1 in output")
 	}
 	if !strings.Contains(output, "User One") {
 		t.Error("expected git name in output")
@@ -82,16 +78,16 @@ default: work`,
 		`bindings: []`,
 	)
 
-	output, err := Resolve("/some/random/dir", Bash, mockTokenFn)
+	output, err := Resolve("/some/random/dir", Bash)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !strings.Contains(output, "export GH_TOKEN=") {
-		t.Error("expected bash export syntax")
+	if !strings.Contains(output, "gh auth switch --user user2") {
+		t.Error("expected gh auth switch for user2")
 	}
-	if !strings.Contains(output, "mock-token-for-user2") {
-		t.Error("expected token for user2")
+	if !strings.Contains(output, "export GIT_AUTHOR_NAME=") {
+		t.Error("expected bash export syntax")
 	}
 }
 
@@ -101,7 +97,7 @@ func TestResolve_NoProfile(t *testing.T) {
 		`bindings: []`,
 	)
 
-	output, err := Resolve("/some/dir", Fish, mockTokenFn)
+	output, err := Resolve("/some/dir", Fish)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -115,7 +111,7 @@ func TestResolve_NoConfig(t *testing.T) {
 	// Point to an empty dir (no config files).
 	t.Setenv("GH_IDENTITY_CONFIG_DIR", t.TempDir())
 
-	output, err := Resolve("/some/dir", Zsh, mockTokenFn)
+	output, err := Resolve("/some/dir", Zsh)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -136,12 +132,15 @@ default: test`,
 		`bindings: []`,
 	)
 
-	output, err := Resolve("/any", Zsh, mockTokenFn)
+	output, err := Resolve("/any", Zsh)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if !strings.Contains(output, "export GH_TOKEN=") {
-		t.Error("expected posix export for zsh")
+	if !strings.Contains(output, "unset GH_TOKEN") {
+		t.Error("expected GH_TOKEN unset for zsh")
+	}
+	if !strings.Contains(output, "gh auth switch --user testuser") {
+		t.Error("expected gh auth switch for zsh")
 	}
 }

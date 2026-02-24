@@ -21,7 +21,7 @@ func newSwitchCmd(auth ghauth.Auth) *cobra.Command {
 	}
 }
 
-func runSwitch(auth ghauth.Auth, profileName string) error {
+func runSwitch(_ ghauth.Auth, profileName string) error {
 	profiles, err := config.LoadProfiles()
 	if err != nil {
 		return err
@@ -32,14 +32,9 @@ func runSwitch(auth ghauth.Auth, profileName string) error {
 		return err
 	}
 
-	// Get token for the profile's gh user.
-	token, err := auth.Token(profile.GHUser)
-	if err != nil {
-		return fmt.Errorf("getting token: %w", err)
-	}
-
-	// Print export commands for the user to eval.
-	fmt.Printf("export GH_TOKEN=%q\n", token)
+	// Print commands for the user to eval.
+	fmt.Println("unset GH_TOKEN 2>/dev/null")
+	fmt.Printf("gh auth switch --user %s 2>/dev/null\n", profile.GHUser)
 	fmt.Printf("export GIT_AUTHOR_NAME=%q\n", profile.GitName)
 	fmt.Printf("export GIT_AUTHOR_EMAIL=%q\n", profile.GitEmail)
 	fmt.Printf("export GIT_COMMITTER_NAME=%q\n", profile.GitName)

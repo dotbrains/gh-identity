@@ -4,7 +4,6 @@ package hook
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/dotbrains/gh-identity/internal/config"
@@ -22,20 +21,17 @@ const (
 
 // EnvOutput holds the environment variables to export.
 type EnvOutput struct {
-	GHToken           string
+	GHUser            string // gh auth account to switch to
 	GitAuthorName     string
 	GitAuthorEmail    string
 	GitCommitterName  string
 	GitCommitterEmail string
 	GHIdentityProfile string
 	GHSSHCommand      string // optional
-	GitAskPass        string // optional: path to askpass helper for HTTPS auth
 }
 
-// Resolve loads config, resolves the binding for dir, and returns shell export statements.
-// tokenFn is called to obtain the GH_TOKEN for the resolved profile's gh_user.
-// It is separated to allow the hook binary to call gh auth token itself.
-func Resolve(dir string, shell ShellType, tokenFn func(ghUser string) (string, error)) (string, error) {
+// Resolve loads config, resolves the binding for dir, and returns shell statements.
+func Resolve(dir string, shell ShellType) (string, error) {
 	profiles, err := config.LoadProfiles()
 	if err != nil {
 		return "", fmt.Errorf("loading profiles: %w", err)
@@ -61,13 +57,8 @@ func Resolve(dir string, shell ShellType, tokenFn func(ghUser string) (string, e
 		return "", fmt.Errorf("getting profile %q: %w", result.Profile, err)
 	}
 
-	token, err := tokenFn(profile.GHUser)
-	if err != nil {
-		return "", fmt.Errorf("getting token for %s: %w", profile.GHUser, err)
-	}
-
 	env := EnvOutput{
-		GHToken:           token,
+		GHUser:            profile.GHUser,
 		GitAuthorName:     profile.GitName,
 		GitAuthorEmail:    profile.GitEmail,
 		GitCommitterName:  profile.GitName,
@@ -82,23 +73,18 @@ func Resolve(dir string, shell ShellType, tokenFn func(ghUser string) (string, e
 		}
 	}
 
-	// Set GIT_ASKPASS so git HTTPS operations use the resolved GH_TOKEN.
-	askpassPath, err := config.AskPassPath()
-	if err == nil {
-		if _, statErr := os.Stat(askpassPath); statErr == nil {
-			env.GitAskPass = askpassPath
-		}
-	}
-
-	return formatExports(shell, env), nil
+	return formatOutput(shell, env), nil
 }
 
-func formatExports(shell ShellType, env EnvOutput) string {
+func formatOutput(shell ShellType, env EnvOutput) string {
 	var b strings.Builder
 
 	switch shell {
 	case Fish:
-		writeFishExport(&b, "GH_TOKEN", env.GHToken)
+		// Unset GH_TOKEN so it doesn't override gh auth's keyring token.
+		b.WriteString("set -e GH_TOKEN 2>/dev/null\n")
+		// Switch gh CLI to the correct account.
+		fmt.Fprintf(&b, "gh auth switch --user %s 2>/dev/null\n", env.GHUser)
 		writeFishExport(&b, "GIT_AUTHOR_NAME", env.GitAuthorName)
 		writeFishExport(&b, "GIT_AUTHOR_EMAIL", env.GitAuthorEmail)
 		writeFishExport(&b, "GIT_COMMITTER_NAME", env.GitCommitterName)
@@ -107,11 +93,11 @@ func formatExports(shell ShellType, env EnvOutput) string {
 		if env.GHSSHCommand != "" {
 			writeFishExport(&b, "GIT_SSH_COMMAND", env.GHSSHCommand)
 		}
-		if env.GitAskPass != "" {
-			writeFishExport(&b, "GIT_ASKPASS", env.GitAskPass)
-		}
 	default: // bash, zsh
-		writePosixExport(&b, "GH_TOKEN", env.GHToken)
+		// Unset GH_TOKEN so it doesn't override gh auth's keyring token.
+		b.WriteString("unset GH_TOKEN 2>/dev/null\n")
+		// Switch gh CLI to the correct account.
+		fmt.Fprintf(&b, "gh auth switch --user %s 2>/dev/null\n", env.GHUser)
 		writePosixExport(&b, "GIT_AUTHOR_NAME", env.GitAuthorName)
 		writePosixExport(&b, "GIT_AUTHOR_EMAIL", env.GitAuthorEmail)
 		writePosixExport(&b, "GIT_COMMITTER_NAME", env.GitCommitterName)
@@ -119,9 +105,6 @@ func formatExports(shell ShellType, env EnvOutput) string {
 		writePosixExport(&b, "GH_IDENTITY_PROFILE", env.GHIdentityProfile)
 		if env.GHSSHCommand != "" {
 			writePosixExport(&b, "GIT_SSH_COMMAND", env.GHSSHCommand)
-		}
-		if env.GitAskPass != "" {
-			writePosixExport(&b, "GIT_ASKPASS", env.GitAskPass)
 		}
 	}
 

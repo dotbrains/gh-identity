@@ -69,16 +69,3 @@ func TestBinDir(t *testing.T) {
 		t.Errorf("BinDir() = %q, want %q", dir, want)
 	}
 }
-
-func TestAskPassPath(t *testing.T) {
-	tmp := t.TempDir()
-	t.Setenv("GH_IDENTITY_CONFIG_DIR", tmp)
-	p, err := AskPassPath()
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := filepath.Join(tmp, "bin", "gh-identity-askpass")
-	if p != want {
-		t.Errorf("AskPassPath() = %q, want %q", p, want)
-	}
-}
