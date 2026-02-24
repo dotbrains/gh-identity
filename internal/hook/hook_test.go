@@ -83,3 +83,41 @@ func TestFormatExports_NoSSHCommand(t *testing.T) {
 		t.Error("GIT_SSH_COMMAND should not be set when SSH key is empty")
 	}
 }
+
+func TestFormatExports_AskPass(t *testing.T) {
+	env := EnvOutput{
+		GHToken:           "token123",
+		GitAuthorName:     "Test",
+		GitAuthorEmail:    "test@test.com",
+		GitCommitterName:  "Test",
+		GitCommitterEmail: "test@test.com",
+		GHIdentityProfile: "work",
+		GitAskPass:        "/home/user/.config/gh-identity/bin/gh-identity-askpass",
+	}
+
+	output := formatExports(Fish, env)
+	if !strings.Contains(output, "GIT_ASKPASS") {
+		t.Error("missing GIT_ASKPASS export when askpass path is set")
+	}
+
+	output = formatExports(Bash, env)
+	if !strings.Contains(output, "export GIT_ASKPASS=") {
+		t.Error("missing bash GIT_ASKPASS export when askpass path is set")
+	}
+}
+
+func TestFormatExports_NoAskPass(t *testing.T) {
+	env := EnvOutput{
+		GHToken:           "token123",
+		GitAuthorName:     "Test",
+		GitAuthorEmail:    "test@test.com",
+		GitCommitterName:  "Test",
+		GitCommitterEmail: "test@test.com",
+		GHIdentityProfile: "work",
+	}
+
+	output := formatExports(Fish, env)
+	if strings.Contains(output, "GIT_ASKPASS") {
+		t.Error("GIT_ASKPASS should not be set when askpass path is empty")
+	}
+}

@@ -4,6 +4,7 @@ package hook
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/dotbrains/gh-identity/internal/config"
@@ -28,6 +29,7 @@ type EnvOutput struct {
 	GitCommitterEmail string
 	GHIdentityProfile string
 	GHSSHCommand      string // optional
+	GitAskPass        string // optional: path to askpass helper for HTTPS auth
 }
 
 // Resolve loads config, resolves the binding for dir, and returns shell export statements.
@@ -80,6 +82,14 @@ func Resolve(dir string, shell ShellType, tokenFn func(ghUser string) (string, e
 		}
 	}
 
+	// Set GIT_ASKPASS so git HTTPS operations use the resolved GH_TOKEN.
+	askpassPath, err := config.AskPassPath()
+	if err == nil {
+		if _, statErr := os.Stat(askpassPath); statErr == nil {
+			env.GitAskPass = askpassPath
+		}
+	}
+
 	return formatExports(shell, env), nil
 }
 
@@ -97,6 +107,9 @@ func formatExports(shell ShellType, env EnvOutput) string {
 		if env.GHSSHCommand != "" {
 			writeFishExport(&b, "GIT_SSH_COMMAND", env.GHSSHCommand)
 		}
+		if env.GitAskPass != "" {
+			writeFishExport(&b, "GIT_ASKPASS", env.GitAskPass)
+		}
 	default: // bash, zsh
 		writePosixExport(&b, "GH_TOKEN", env.GHToken)
 		writePosixExport(&b, "GIT_AUTHOR_NAME", env.GitAuthorName)
@@ -106,6 +119,9 @@ func formatExports(shell ShellType, env EnvOutput) string {
 		writePosixExport(&b, "GH_IDENTITY_PROFILE", env.GHIdentityProfile)
 		if env.GHSSHCommand != "" {
 			writePosixExport(&b, "GIT_SSH_COMMAND", env.GHSSHCommand)
+		}
+		if env.GitAskPass != "" {
+			writePosixExport(&b, "GIT_ASKPASS", env.GitAskPass)
 		}
 	}
 

@@ -72,3 +72,12 @@ func BinDir() (string, error) {
 	}
 	return filepath.Join(dir, "bin"), nil
 }
+
+// AskPassPath returns the path to the git askpass helper script.
+func AskPassPath() (string, error) {
+	binDir, err := BinDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(binDir, "gh-identity-askpass"), nil
+}
