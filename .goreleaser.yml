@@ -36,6 +36,20 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
+brews:
+  - repository:
+      owner: dotbrains
+      name: homebrew-tap
+    directory: Formula
+    homepage: https://github.com/dotbrains/gh-identity
+    description: "Multi-account GitHub identity management — automatic context-based account switching and per-directory identity binding."
+    license: MIT
+    install: |
+      bin.install "gh-identity"
+      bin.install "gh-identity-hook"
+    test: |
+      system "#{bin}/gh-identity", "--help"
+
 changelog:
   sort: asc
   filters:
