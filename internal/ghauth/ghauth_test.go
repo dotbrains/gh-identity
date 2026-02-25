@@ -215,9 +215,9 @@ func TestParseActiveUser(t *testing.T) {
 
 func TestParseNameFromJSON(t *testing.T) {
 	tests := []struct {
-		name   string
-		json   string
-		want   string
+		name string
+		json string
+		want string
 	}{
 		{
 			name: "valid name",
@@ -271,9 +271,9 @@ func TestParseNameFromJSON(t *testing.T) {
 
 func TestParsePrimaryEmailFromJSON(t *testing.T) {
 	tests := []struct {
-		name   string
-		json   string
-		want   string
+		name string
+		json string
+		want string
 	}{
 		{
 			name: "primary email",
@@ -337,14 +337,14 @@ func TestParsePrimaryEmailFromJSON(t *testing.T) {
 
 func TestGHAuth_GetUserInfo(t *testing.T) {
 	tests := []struct {
-		name         string
-		userJSON     string
-		userErr      error
-		emailsJSON   string
-		emailsErr    error
-		wantName     string
-		wantEmail    string
-		wantErr      bool
+		name       string
+		userJSON   string
+		userErr    error
+		emailsJSON string
+		emailsErr  error
+		wantName   string
+		wantEmail  string
+		wantErr    bool
 	}{
 		{
 			name: "successful fetch",
@@ -363,15 +363,15 @@ func TestGHAuth_GetUserInfo(t *testing.T) {
 			wantEmail: "octocat@github.com",
 		},
 		{
-			name:     "user API error",
-			userErr:  fmt.Errorf("API error"),
-			wantErr:  true,
+			name:    "user API error",
+			userErr: fmt.Errorf("API error"),
+			wantErr: true,
 		},
 		{
-			name:       "emails API error",
-			userJSON:   `{"name": "Test User"}`,
-			emailsErr:  fmt.Errorf("API error"),
-			wantErr:    true,
+			name:      "emails API error",
+			userJSON:  `{"name": "Test User"}`,
+			emailsErr: fmt.Errorf("API error"),
+			wantErr:   true,
 		},
 	}
 
