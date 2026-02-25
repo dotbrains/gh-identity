@@ -163,7 +163,7 @@ end
 
 - **Language:** Go, using the `go-gh` library for direct integration with `gh`'s auth and config subsystems.
 - **Config format:** YAML, consistent with `gh`'s own config files.
-- **Distribution:** `gh extension install dotbrains/gh-identity`, or via Homebrew (`brew install dotbrains/tap/gh-identity`).
+- **Distribution:** `gh extension install dotbrains/gh-identity`.
 - **Shell hooks:** Installed via `gh identity init` by appending a single `source` line to `~/.config/fish/config.fish`, `~/.bashrc`, or `~/.zshrc`.
 
 ## Testing
@@ -221,7 +221,6 @@ Runs on version tags (`v*`).
 **Jobs:**
 
 1. **goreleaser** — builds binaries, archives, and publishes a GitHub Release via [GoReleaser](https://goreleaser.com).
-2. **homebrew** — updates the `dotbrains/tap` formula with the new version.
 
 ## Documentation
 
@@ -331,5 +330,4 @@ The extension itself handles all interactive commands (`gh identity init`, `gh i
 Primary distribution channels:
 
 - `gh extension install dotbrains/gh-identity`
-- `brew install dotbrains/tap/gh-identity`
 - GitHub Releases (prebuilt binaries for macOS arm64/amd64, Linux amd64)

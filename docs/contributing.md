@@ -57,4 +57,3 @@ Uses `golangci-lint` with the config in `.golangci.yml`.
 2. Tag a new version: `git tag v1.0.0`
 3. Push the tag: `git push origin v1.0.0`
 4. GoReleaser builds binaries and creates a GitHub Release automatically
-5. The Homebrew formula is updated via the release workflow

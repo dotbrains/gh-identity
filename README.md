@@ -35,12 +35,6 @@ A `gh` CLI extension that provides seamless multi-account management, automatic 
 gh extension install dotbrains/gh-identity
 ```
 
-### Via Homebrew
-
-```sh
-brew install --cask dotbrains/tap/gh-identity
-```
-
 ### From source
 
 ```sh
