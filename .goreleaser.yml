@@ -35,7 +35,7 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
-brews:
+homebrew_casks:
   - name: gh-identity
     ids:
       - gh-identity-archive
@@ -43,16 +43,23 @@ brews:
       owner: dotbrains
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    directory: Formula
+    directory: Casks
     homepage: https://github.com/dotbrains/gh-identity
     description: "Multi-account GitHub identity management — automatic context-based account switching and per-directory identity binding."
     license: MIT
     skip_upload: auto
-    install: |
-      bin.install "gh-identity"
-      bin.install "gh-identity-hook"
-    test: |
-      system "#{bin}/gh-identity", "--help"
+    url:
+      verified: github.com/dotbrains/gh-identity
+    binaries:
+      - gh-identity
+      - gh-identity-hook
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/gh-identity"]
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/gh-identity-hook"]
+          end
 
 changelog:
   sort: asc
