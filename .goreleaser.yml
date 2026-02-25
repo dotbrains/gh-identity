@@ -27,10 +27,12 @@ builds:
 
 archives:
   - id: gh-identity-archive
-    builds:
+    ids:
       - gh-identity
       - gh-identity-hook
-    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
 
 checksum:
@@ -41,7 +43,7 @@ brews:
       owner: dotbrains
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    directory: Formula
+    folder: Formula
     homepage: https://github.com/dotbrains/gh-identity
     description: "Multi-account GitHub identity management — automatic context-based account switching and per-directory identity binding."
     license: MIT
