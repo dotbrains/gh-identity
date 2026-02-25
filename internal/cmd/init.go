@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -60,20 +61,33 @@ func runInit(auth ghauth.Auth) error {
 	for _, user := range users {
 		fmt.Printf("\n--- Profile for %s ---\n", user)
 
+		// Infer defaults
+		defaultGitName, defaultGitEmail := inferGitDetails(auth, user)
+		defaultSSHKey := detectSSHKey()
+
 		fmt.Printf("Profile name [%s]: ", user)
 		name := readLine(reader)
 		if name == "" {
 			name = user
 		}
 
-		fmt.Printf("Git name: ")
+		fmt.Printf("Git name [%s]: ", defaultGitName)
 		gitName := readLine(reader)
+		if gitName == "" {
+			gitName = defaultGitName
+		}
 
-		fmt.Printf("Git email: ")
+		fmt.Printf("Git email [%s]: ", defaultGitEmail)
 		gitEmail := readLine(reader)
+		if gitEmail == "" {
+			gitEmail = defaultGitEmail
+		}
 
-		fmt.Printf("SSH key path (optional): ")
+		fmt.Printf("SSH key path [%s]: ", defaultSSHKey)
 		sshKey := readLine(reader)
+		if sshKey == "" {
+			sshKey = defaultSSHKey
+		}
 
 		profiles.AddProfile(name, config.Profile{
 			GHUser:   user,
@@ -218,4 +232,57 @@ func detectShell() string {
 		}
 	}
 	return "bash" // default fallback
+}
+
+// inferGitDetails tries to infer git name and email from:
+// 1. GitHub API
+// 2. Global git config
+func inferGitDetails(auth ghauth.Auth, username string) (string, string) {
+	var name, email string
+
+	// Try GitHub API first
+	if ghAuth, ok := auth.(*ghauth.GHAuth); ok {
+		if info, err := ghAuth.GetUserInfo(username); err == nil {
+			if info.Name != "" {
+				name = info.Name
+			}
+			if info.Email != "" {
+				email = info.Email
+			}
+		}
+	}
+
+	// Fallback to global git config if not found
+	if name == "" {
+		if output, err := exec.Command("git", "config", "--global", "user.name").Output(); err == nil {
+			name = strings.TrimSpace(string(output))
+		}
+	}
+	if email == "" {
+		if output, err := exec.Command("git", "config", "--global", "user.email").Output(); err == nil {
+			email = strings.TrimSpace(string(output))
+		}
+	}
+
+	return name, email
+}
+
+// detectSSHKey tries to find a default SSH key in ~/.ssh/
+func detectSSHKey() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+
+	sshDir := filepath.Join(home, ".ssh")
+	// Check common key names in order of preference
+	keyNames := []string{"id_ed25519", "id_rsa", "id_ecdsa"}
+	for _, keyName := range keyNames {
+		keyPath := filepath.Join(sshDir, keyName)
+		if _, err := os.Stat(keyPath); err == nil {
+			return keyPath
+		}
+	}
+
+	return ""
 }

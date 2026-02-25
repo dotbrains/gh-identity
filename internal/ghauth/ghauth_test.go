@@ -198,15 +198,217 @@ func TestParseActiveUser(t *testing.T) {
 			got, err := parseActiveUser(tt.output)
 			if tt.wantErr {
 				if err == nil {
-					t.Error("expected error")
+					t.Error("expected error, got nil")
 				}
 				return
 			}
 			if err != nil {
-				t.Fatalf("unexpected error: %v", err)
+				t.Errorf("unexpected error: %v", err)
+				return
 			}
 			if got != tt.want {
 				t.Errorf("parseActiveUser() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseNameFromJSON(t *testing.T) {
+	tests := []struct {
+		name   string
+		json   string
+		want   string
+	}{
+		{
+			name: "valid name",
+			json: `{
+  "login": "octocat",
+  "name": "The Octocat",
+  "email": null
+}`,
+			want: "The Octocat",
+		},
+		{
+			name: "name with comma",
+			json: `{
+  "login": "user",
+  "name": "John Doe",
+  "email": null
+}`,
+			want: "John Doe",
+		},
+		{
+			name: "no name field",
+			json: `{
+  "login": "user",
+  "email": "user@example.com"
+}`,
+			want: "",
+		},
+		{
+			name: "null name",
+			json: `{
+  "name": null
+}`,
+			want: "",
+		},
+		{
+			name: "empty json",
+			json: "",
+			want: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseNameFromJSON(tt.json)
+			if got != tt.want {
+				t.Errorf("parseNameFromJSON() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParsePrimaryEmailFromJSON(t *testing.T) {
+	tests := []struct {
+		name   string
+		json   string
+		want   string
+	}{
+		{
+			name: "primary email",
+			json: `[
+  {
+    "email": "user@example.com",
+    "primary": true,
+    "verified": true
+  },
+  {
+    "email": "other@example.com",
+    "primary": false,
+    "verified": true
+  }
+]`,
+			want: "user@example.com",
+		},
+		{
+			name: "single email",
+			json: `[
+  {
+    "email": "test@example.com",
+    "primary": true,
+    "verified": true
+  }
+]`,
+			want: "test@example.com",
+		},
+		{
+			name: "no primary email",
+			json: `[
+  {
+    "email": "user@example.com",
+    "primary": false,
+    "verified": true
+  }
+]`,
+			want: "",
+		},
+		{
+			name: "empty array",
+			json: "[]",
+			want: "",
+		},
+		{
+			name: "empty json",
+			json: "",
+			want: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parsePrimaryEmailFromJSON(tt.json)
+			if got != tt.want {
+				t.Errorf("parsePrimaryEmailFromJSON() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGHAuth_GetUserInfo(t *testing.T) {
+	tests := []struct {
+		name         string
+		userJSON     string
+		userErr      error
+		emailsJSON   string
+		emailsErr    error
+		wantName     string
+		wantEmail    string
+		wantErr      bool
+	}{
+		{
+			name: "successful fetch",
+			userJSON: `{
+  "login": "octocat",
+  "name": "The Octocat"
+}`,
+			emailsJSON: `[
+  {
+    "email": "octocat@github.com",
+    "primary": true,
+    "verified": true
+  }
+]`,
+			wantName:  "The Octocat",
+			wantEmail: "octocat@github.com",
+		},
+		{
+			name:     "user API error",
+			userErr:  fmt.Errorf("API error"),
+			wantErr:  true,
+		},
+		{
+			name:       "emails API error",
+			userJSON:   `{"name": "Test User"}`,
+			emailsErr:  fmt.Errorf("API error"),
+			wantErr:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			callCount := 0
+			g := &GHAuth{
+				exec: func(args ...string) (bytes.Buffer, bytes.Buffer, error) {
+					var stdout, stderr bytes.Buffer
+					callCount++
+					if callCount == 1 {
+						// First call: gh api user
+						stdout.WriteString(tt.userJSON)
+						return stdout, stderr, tt.userErr
+					}
+					// Second call: gh api user/emails
+					stdout.WriteString(tt.emailsJSON)
+					return stdout, stderr, tt.emailsErr
+				},
+			}
+
+			info, err := g.GetUserInfo("testuser")
+			if tt.wantErr {
+				if err == nil {
+					t.Error("expected error, got nil")
+				}
+				return
+			}
+			if err != nil {
+				t.Errorf("unexpected error: %v", err)
+				return
+			}
+			if info.Name != tt.wantName {
+				t.Errorf("GetUserInfo().Name = %q, want %q", info.Name, tt.wantName)
+			}
+			if info.Email != tt.wantEmail {
+				t.Errorf("GetUserInfo().Email = %q, want %q", info.Email, tt.wantEmail)
 			}
 		})
 	}

@@ -73,6 +73,33 @@ func (g *GHAuth) ActiveUser() (string, error) {
 	return parseActiveUser(combined)
 }
 
+// UserInfo holds information about a GitHub user.
+type UserInfo struct {
+	Name  string
+	Email string
+}
+
+// GetUserInfo retrieves the user's name and email from GitHub API.
+func (g *GHAuth) GetUserInfo(username string) (*UserInfo, error) {
+	info := &UserInfo{}
+
+	// Get name from user profile
+	stdout, stderr, err := g.exec("api", "user", "-u", username)
+	if err != nil {
+		return nil, fmt.Errorf("gh api user: %s: %w", stderr.String(), err)
+	}
+	info.Name = parseNameFromJSON(stdout.String())
+
+	// Get primary email
+	stdout, stderr, err = g.exec("api", "user/emails", "-u", username)
+	if err != nil {
+		return nil, fmt.Errorf("gh api user/emails: %s: %w", stderr.String(), err)
+	}
+	info.Email = parsePrimaryEmailFromJSON(stdout.String())
+
+	return info, nil
+}
+
 // parseActiveUser extracts the active username from gh auth status output.
 func parseActiveUser(output string) (string, error) {
 	// Look for "Logged in to github.com account <user>"
@@ -109,4 +136,50 @@ func parseAuthUsers(output string) []string {
 		}
 	}
 	return users
+}
+
+// parseNameFromJSON extracts the name field from GitHub API /user response.
+func parseNameFromJSON(jsonStr string) string {
+	// Simple extraction: look for "name": "value"
+	for _, line := range strings.Split(jsonStr, "\n") {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, `"name":`) {
+			// Extract value between quotes after colon
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				value := strings.TrimSpace(parts[1])
+				value = strings.Trim(value, `",`)
+				// Return empty if null
+				if value == "null" {
+					return ""
+				}
+				return value
+			}
+		}
+	}
+	return ""
+}
+
+// parsePrimaryEmailFromJSON extracts the primary email from GitHub API /user/emails response.
+func parsePrimaryEmailFromJSON(jsonStr string) string {
+	// Look for "email": "...", followed by "primary": true
+	lines := strings.Split(jsonStr, "\n")
+	for i, line := range lines {
+		line = strings.TrimSpace(line)
+		if strings.HasPrefix(line, `"primary":`) && strings.Contains(line, "true") {
+			// Look backwards for the email field
+			for j := i - 1; j >= 0; j-- {
+				emailLine := strings.TrimSpace(lines[j])
+				if strings.HasPrefix(emailLine, `"email":`) {
+					parts := strings.SplitN(emailLine, ":", 2)
+					if len(parts) == 2 {
+						value := strings.TrimSpace(parts[1])
+						value = strings.Trim(value, `",`)
+						return value
+					}
+				}
+			}
+		}
+	}
+	return ""
 }
