@@ -38,7 +38,7 @@ gh extension install dotbrains/gh-identity
 ### Via Homebrew
 
 ```sh
-brew install dotbrains/tap/gh-identity
+brew install --cask dotbrains/tap/gh-identity
 ```
 
 ### From source
