@@ -13,16 +13,19 @@ import (
 )
 
 func newDoctorCmd(auth ghauth.Auth) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "doctor",
 		Short: "Validate the full gh-identity setup",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runDoctor(auth)
+			fix, _ := cmd.Flags().GetBool("fix")
+			return runDoctor(auth, fix)
 		},
 	}
+	cmd.Flags().Bool("fix", false, "Automatically fix detected issues (e.g. includeIf ordering)")
+	return cmd
 }
 
-func runDoctor(auth ghauth.Auth) error {
+func runDoctor(auth ghauth.Auth, fix bool) error {
 	fmt.Println("🩺 gh-identity doctor")
 	fmt.Println()
 
@@ -62,21 +65,15 @@ func runDoctor(auth ghauth.Auth) error {
 	}
 
 	// Check 3: All profiles reference authenticated gh accounts.
+	// Note: gh auth status -a only shows the active account, so we probe each
+	// user individually via gh auth token -u <user> which works for any
+	// authenticated account regardless of which is currently active.
 	if profiles != nil {
-		authedUsers, err := auth.AuthenticatedUsers()
-		if err != nil {
-			fmt.Printf("⚠️  Cannot list authenticated users: %v\n", err)
-		} else {
-			authedSet := make(map[string]bool)
-			for _, u := range authedUsers {
-				authedSet[u] = true
-			}
-			for name, p := range profiles.Profiles {
-				if !authedSet[p.GHUser] {
-					fmt.Printf("❌ Profile %q references user %q which is not authenticated.\n", name, p.GHUser)
-					fmt.Printf("   Run `gh auth login` to authenticate as %s.\n", p.GHUser)
-					issues++
-				}
+		for name, p := range profiles.Profiles {
+			if _, err := auth.Token(p.GHUser); err != nil {
+				fmt.Printf("❌ Profile %q references user %q which is not authenticated.\n", name, p.GHUser)
+				fmt.Printf("   Run `gh auth login` to authenticate as %s.\n", p.GHUser)
+				issues++
 			}
 		}
 	}
@@ -164,6 +161,26 @@ func runDoctor(auth ghauth.Auth) error {
 		managed, err := gitconfig.ListManagedIncludeIfs(gcPath)
 		if err == nil && len(managed) > 0 {
 			fmt.Printf("✅ %d managed includeIf directive(s) in %s\n", len(managed), gcPath)
+		}
+	}
+
+	// Check 9: includeIf ordering — [user] must not appear after managed blocks.
+	if gcPath != "" {
+		badOrder, err := gitconfig.HasUserAfterIncludeIfs(gcPath)
+		if err == nil && badOrder {
+			fmt.Println("❌ Global [user] section appears after managed includeIf directives.")
+			fmt.Println("   Git uses last-value-wins, so the global identity overrides your bound profiles.")
+			issues++
+			if fix {
+				if err := gitconfig.SyncIncludeIfs(gcPath); err != nil {
+					fmt.Printf("   ❌ Failed to fix: %v\n", err)
+				} else {
+					fmt.Println("   ✅ Fixed: moved managed includeIf directives to end of ~/.gitconfig.")
+					issues-- // resolved
+				}
+			} else {
+				fmt.Println("   Run `gh identity doctor --fix` to auto-repair.")
+			}
 		}
 	}
 

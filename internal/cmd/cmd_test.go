@@ -24,6 +24,15 @@ func (m *mockAuth) Token(username string) (string, error) {
 	if tok, ok := m.tokens[username]; ok {
 		return tok, nil
 	}
+	// If users list is set, only return tokens for known users.
+	for _, u := range m.users {
+		if u == username {
+			return "mock-token-" + username, nil
+		}
+	}
+	if len(m.users) > 0 {
+		return "", fmt.Errorf("no token for %s", username)
+	}
 	return "mock-token-" + username, nil
 }
 
@@ -783,7 +792,7 @@ func TestRunDoctor_NoConfig(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -822,7 +831,7 @@ func TestRunDoctor_ValidSetup(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -860,7 +869,7 @@ func TestRunDoctor_InvalidProfile(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -899,7 +908,7 @@ func TestRunDoctor_BadBinding(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -931,7 +940,7 @@ func TestRunDoctor_EmptyProfiles(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -967,7 +976,7 @@ func TestRunDoctor_ValidationErrors(t *testing.T) {
 	r, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -1136,7 +1145,7 @@ func TestRunDoctor_SSHKeyValid(t *testing.T) {
 	r2, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -1174,7 +1183,7 @@ func TestRunDoctor_SSHKeyMissing(t *testing.T) {
 	r2, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -1218,7 +1227,7 @@ func TestRunDoctor_SSHKeyPermissive(t *testing.T) {
 	r2, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
@@ -1263,7 +1272,7 @@ func TestRunDoctor_AllChecksPassed(t *testing.T) {
 	r2, w, _ := os.Pipe()
 	os.Stdout = w
 
-	err := runDoctor(auth)
+	err := runDoctor(auth, false)
 
 	w.Close()
 	os.Stdout = old
