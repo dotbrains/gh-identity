@@ -1,9 +1,9 @@
 # gh-identity
 
-![gh-identity](https://raw.githubusercontent.com/dotbrains/gh-identity/main/assets/og-image.svg)
+![gh-identity](https://raw.githubusercontent.com/smeltery/gh-identity/main/assets/og-image.svg)
 
-[![CI](https://github.com/dotbrains/gh-identity/actions/workflows/ci.yml/badge.svg)](https://github.com/dotbrains/gh-identity/actions/workflows/ci.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/dotbrains/gh-identity)](https://goreportcard.com/report/github.com/dotbrains/gh-identity)
+[![CI](https://github.com/smeltery/gh-identity/actions/workflows/ci.yml/badge.svg)](https://github.com/smeltery/gh-identity/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/smeltery/gh-identity)](https://goreportcard.com/report/github.com/smeltery/gh-identity)
 [![License: PolyForm Shield 1.0.0](https://img.shields.io/badge/License-PolyForm%20Shield%201.0.0-blue.svg)](https://polyformproject.org/licenses/shield/1.0.0/)
 
 ![Go](https://img.shields.io/badge/-Go-00ADD8?style=flat-square&logo=go&logoColor=white)
@@ -32,13 +32,13 @@ A `gh` CLI extension that provides seamless multi-account management, automatic 
 ### Via `gh` extension
 
 ```sh
-gh extension install dotbrains/gh-identity
+gh extension install smeltery/gh-identity
 ```
 
 ### From source
 
 ```sh
-git clone https://github.com/dotbrains/gh-identity.git
+git clone https://github.com/smeltery/gh-identity.git
 cd gh-identity
 make build
 make install
@@ -105,7 +105,7 @@ Display the active identity, bound directory, and source.
   Name:     Nicholas Adamou
   Email:    nicholasadamou@users.noreply.github.com
   SSH Key:  ~/.ssh/id_ed25519_personal
-  Bound by: ~/code/github.com/dotbrains
+  Bound by: ~/code/github.com/smeltery
 ```
 
 ### `gh identity clone <repo> [--profile <profile>]`

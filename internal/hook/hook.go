@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dotbrains/gh-identity/internal/config"
-	"github.com/dotbrains/gh-identity/internal/resolve"
+	"github.com/smeltery/gh-identity/internal/config"
+	"github.com/smeltery/gh-identity/internal/resolve"
 )
 
 // ShellType represents a supported shell.

@@ -12,7 +12,7 @@ linters:
 
 linters-settings:
   goimports:
-    local-prefixes: github.com/dotbrains/gh-identity
+    local-prefixes: github.com/smeltery/gh-identity
 
 issues:
   exclude-rules:

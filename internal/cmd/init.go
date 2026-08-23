@@ -11,8 +11,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/dotbrains/gh-identity/internal/config"
-	"github.com/dotbrains/gh-identity/internal/ghauth"
+	"github.com/smeltery/gh-identity/internal/config"
+	"github.com/smeltery/gh-identity/internal/ghauth"
 )
 
 func newInitCmd(auth ghauth.Auth) *cobra.Command {

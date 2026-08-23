@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dotbrains/gh-identity/internal/config"
+	"github.com/smeltery/gh-identity/internal/config"
 )
 
 // Result holds the outcome of a binding resolution.

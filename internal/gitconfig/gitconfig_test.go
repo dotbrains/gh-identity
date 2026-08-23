@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dotbrains/gh-identity/internal/config"
+	"github.com/smeltery/gh-identity/internal/config"
 )
 
 func TestWriteProfileFragmentTo(t *testing.T) {
@@ -134,7 +134,7 @@ func TestSyncIncludeIfs(t *testing.T) {
 	gcPath := filepath.Join(tmp, ".gitconfig")
 
 	// Simulate: managed blocks, then [user] at the bottom (the bug).
-	content := `[includeIf "gitdir:/code/dotbrains/"] # managed by gh-identity
+	content := `[includeIf "gitdir:/code/smeltery/"] # managed by gh-identity
     path = /cfg/personal.gitconfig
 [credential "https://github.com"]
     helper = !/opt/homebrew/bin/gh auth git-credential
@@ -157,7 +157,7 @@ func TestSyncIncludeIfs(t *testing.T) {
 
 	// The managed block should be at the very end.
 	userIdx := strings.Index(result, "[user]")
-	includeIdx := strings.Index(result, `[includeIf "gitdir:/code/dotbrains/"]`)
+	includeIdx := strings.Index(result, `[includeIf "gitdir:/code/smeltery/"]`)
 	if includeIdx <= userIdx {
 		t.Errorf("managed includeIf should appear after [user]; user at %d, includeIf at %d", userIdx, includeIdx)
 	}

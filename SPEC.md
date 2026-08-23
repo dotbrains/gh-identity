@@ -71,7 +71,7 @@ Bindings are stored in `~/.config/gh-identity/bindings.yml`:
 
 ```yaml
 bindings:
-  - path: ~/code/github.com/dotbrains
+  - path: ~/code/github.com/smeltery
     profile: personal
   - path: ~/code/github.com/my-company
     profile: work
@@ -132,7 +132,7 @@ Display the active profile, the resolved `gh` user, git identity, and which bind
  Name:     Nicholas Adamou
  Email:    nicholasadamou@users.noreply.github.com
  SSH Key:  ~/.ssh/id_ed25519_personal
- Bound by: ~/code/github.com/dotbrains
+ Bound by: ~/code/github.com/smeltery
 ```
 
 #### `gh identity clone <repo> [--profile <profile>]`
@@ -163,7 +163,7 @@ end
 
 - **Language:** Go, using the `go-gh` library for direct integration with `gh`'s auth and config subsystems.
 - **Config format:** YAML, consistent with `gh`'s own config files.
-- **Distribution:** `gh extension install dotbrains/gh-identity`.
+- **Distribution:** `gh extension install smeltery/gh-identity`.
 - **Shell hooks:** Installed via `gh identity init` by appending a single `source` line to `~/.config/fish/config.fish`, `~/.bashrc`, or `~/.zshrc`.
 
 ## Testing
@@ -321,7 +321,7 @@ The shell hook still exports `GIT_AUTHOR_NAME`/`GIT_AUTHOR_EMAIL` as a belt-and-
 
 ### 3. Packaging: `gh` extension with standalone shell hook binary
 
-`gh-identity` ships as a **`gh` extension** (`gh extension install dotbrains/gh-identity`) with a companion standalone binary for the shell hook.
+`gh-identity` ships as a **`gh` extension** (`gh extension install smeltery/gh-identity`) with a companion standalone binary for the shell hook.
 
 The extension itself handles all interactive commands (`gh identity init`, `gh identity bind`, `gh identity status`, etc.) through the standard `gh` extension lifecycle. However, the shell hook — which fires on every directory change — invokes a lightweight standalone binary (`gh-identity-hook`) that resolves the active profile in <5ms without paying `gh`'s ~50ms startup overhead.
 
@@ -329,5 +329,5 @@ The extension itself handles all interactive commands (`gh identity init`, `gh i
 
 Primary distribution channels:
 
-- `gh extension install dotbrains/gh-identity`
+- `gh extension install smeltery/gh-identity`
 - GitHub Releases (prebuilt binaries for macOS arm64/amd64, Linux amd64)

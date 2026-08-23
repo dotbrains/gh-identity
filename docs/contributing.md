@@ -4,7 +4,7 @@
 
 1. Clone the repo:
    ```sh
-   git clone https://github.com/dotbrains/gh-identity.git
+   git clone https://github.com/smeltery/gh-identity.git
    cd gh-identity
    ```
 

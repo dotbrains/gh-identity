@@ -1,7 +1,7 @@
 .PHONY: build build-hook test test-integration lint coverage clean install
 
 BIN_DIR := bin
-MODULE := github.com/dotbrains/gh-identity
+MODULE := github.com/smeltery/gh-identity
 
 build:
 	go build -o $(BIN_DIR)/gh-identity ./cmd/gh-identity

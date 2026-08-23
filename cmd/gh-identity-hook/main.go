@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/dotbrains/gh-identity/internal/hook"
+	"github.com/smeltery/gh-identity/internal/hook"
 )
 
 func main() {

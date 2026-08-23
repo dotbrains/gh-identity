@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dotbrains/gh-identity/internal/config"
+	"github.com/smeltery/gh-identity/internal/config"
 )
 
 func TestWriteProfileFragment(t *testing.T) {

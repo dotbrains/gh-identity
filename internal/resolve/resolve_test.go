@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/dotbrains/gh-identity/internal/config"
+	"github.com/smeltery/gh-identity/internal/config"
 )
 
 func TestForDirectory_ExactMatch(t *testing.T) {

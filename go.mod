@@ -1,4 +1,4 @@
-module github.com/dotbrains/gh-identity
+module github.com/smeltery/gh-identity
 
 go 1.25.0
 

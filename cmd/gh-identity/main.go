@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dotbrains/gh-identity/internal/cmd"
+	"github.com/smeltery/gh-identity/internal/cmd"
 )
 
 func main() {
